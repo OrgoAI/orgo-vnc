@@ -1,0 +1,55 @@
+{
+  "name": "orgo-vnc",
+  "version": "0.2.0",
+  "description": "Embed cloud desktops in your React app",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "patches"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "prepublishOnly": "npm run build",
+    "postinstall": "patch-package"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0"
+  },
+  "keywords": [
+    "vnc",
+    "desktop",
+    "remote",
+    "cloud",
+    "react",
+    "orgo"
+  ],
+  "author": "Orgo",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/OrgoAI/orgo-vnc"
+  },
+  "homepage": "https://orgo.ai",
+  "type": "commonjs",
+  "dependencies": {
+    "@novnc/novnc": "^1.6.0",
+    "patch-package": "^8.0.1"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3"
+  }
+}
