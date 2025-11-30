@@ -1,7 +1,6 @@
 'use client';
 
-import { useMemo, useImperativeHandle, forwardRef, useState, useEffect } from 'react';
-import { useVNC } from './useVNC';
+import { forwardRef, useState, useEffect, useImperativeHandle } from 'react';
 import type { ComputerDisplayProps, ComputerDisplayRef } from './types';
 
 export const ComputerDisplay = forwardRef<ComputerDisplayRef, ComputerDisplayProps>(({
@@ -22,53 +21,23 @@ export const ComputerDisplay = forwardRef<ComputerDisplayRef, ComputerDisplayPro
   onError,
   onClipboard,
 }, ref) => {
-  const [mounted, setMounted] = useState(false);
+  const [Client, setClient] = useState<React.ComponentType<any> | null>(null);
 
   useEffect(() => {
-    setMounted(true);
+    import('./VNCClient').then(mod => setClient(() => mod.VNCClient));
   }, []);
 
-  const url = useMemo(() => mounted ? `wss://${instanceId}.orgo.dev/websockify` : '', [instanceId, mounted]);
-
-  const credentials = useMemo(() => ({
-    username: 'user',
-    password,
-    target: `${instanceId}.orgo.dev`,
-  }), [instanceId, password]);
-
-  const {
-    vncRef,
-    isConnected,
-    reconnect,
-    disconnect,
-    sendClipboard,
-    pasteFromClipboard,
-  } = useVNC({
-    url,
-    credentials,
-    background,
-    viewOnly: readOnly,
-    scaleViewport,
-    clipViewport,
-    resizeSession,
-    showDotCursor,
-    compressionLevel,
-    qualityLevel,
-    onConnect,
-    onDisconnect,
-    onError,
-    onClipboard,
-  });
+  const [clientRef, setClientRef] = useState<ComputerDisplayRef | null>(null);
 
   useImperativeHandle(ref, () => ({
-    reconnect,
-    disconnect,
-    sendClipboard,
-    pasteFromClipboard,
-    isConnected,
-  }), [reconnect, disconnect, sendClipboard, pasteFromClipboard, isConnected]);
+    reconnect: () => clientRef?.reconnect(),
+    disconnect: () => clientRef?.disconnect(),
+    sendClipboard: (text: string) => clientRef?.sendClipboard(text) ?? false,
+    pasteFromClipboard: () => clientRef?.pasteFromClipboard() ?? Promise.resolve(false),
+    isConnected: clientRef?.isConnected ?? false,
+  }), [clientRef]);
 
-  if (!mounted) {
+  if (!Client) {
     return (
       <div
         className={className}
@@ -83,19 +52,24 @@ export const ComputerDisplay = forwardRef<ComputerDisplayRef, ComputerDisplayPro
   }
 
   return (
-    <div
-      ref={vncRef}
+    <Client
+      ref={setClientRef}
+      instanceId={instanceId}
+      password={password}
+      readOnly={readOnly}
+      background={background}
       className={className}
-      style={{
-        width: '100%',
-        height: '100%',
-        background,
-        pointerEvents: readOnly ? 'none' : 'auto',
-        cursor: readOnly ? 'default' : 'none',
-        opacity: isConnected ? 1 : 0,
-        transition: 'opacity 0.3s ease-in-out',
-        ...style,
-      }}
+      style={style}
+      scaleViewport={scaleViewport}
+      clipViewport={clipViewport}
+      resizeSession={resizeSession}
+      showDotCursor={showDotCursor}
+      compressionLevel={compressionLevel}
+      qualityLevel={qualityLevel}
+      onConnect={onConnect}
+      onDisconnect={onDisconnect}
+      onError={onError}
+      onClipboard={onClipboard}
     />
   );
 });

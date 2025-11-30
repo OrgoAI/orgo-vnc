@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import RFB from '@novnc/novnc/lib/rfb';
 import type { UseVNCConfig, UseVNCReturn } from './types';
 
 interface ExtendedRFB {
@@ -21,6 +20,7 @@ interface ExtendedRFB {
 }
 
 export function useVNC({
+  RFB,
   url,
   credentials,
   background = '#1E1E1E',
@@ -35,7 +35,7 @@ export function useVNC({
   onDisconnect,
   onError,
   onClipboard,
-}: UseVNCConfig): UseVNCReturn {
+}: UseVNCConfig & { RFB: any }): UseVNCReturn {
   const vncRef = useRef<HTMLDivElement>(null);
   const rfbRef = useRef<ExtendedRFB | null>(null);
   const [isConnected, setIsConnected] = useState(false);
@@ -86,7 +86,6 @@ export function useVNC({
   }, []);
 
   const connect = useCallback(() => {
-    if (typeof window === 'undefined') return;
     if (!vncRef.current || !url || !isMounted.current || connecting.current || isDisconnecting.current) return;
 
     connecting.current = true;
@@ -105,7 +104,7 @@ export function useVNC({
             target: credentials?.target || '',
           },
           shared: true,
-        }) as unknown as ExtendedRFB;
+        }) as ExtendedRFB;
 
         rfb.viewOnly = viewOnly;
         rfb.scaleViewport = scaleViewport;
@@ -227,11 +226,9 @@ export function useVNC({
         }
       }
     }, isDisconnecting.current ? 200 : 50);
-  }, [url, credentials, background, viewOnly, scaleViewport, clipViewport, resizeSession, showDotCursor, compressionLevel, qualityLevel, onConnect, onDisconnect, onError, onClipboard, disconnect]);
+  }, [RFB, url, credentials, background, viewOnly, scaleViewport, clipViewport, resizeSession, showDotCursor, compressionLevel, qualityLevel, onConnect, onDisconnect, onError, onClipboard, disconnect]);
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-    
     isMounted.current = true;
     disconnect();
     const timer = setTimeout(() => url && isMounted.current && connect(), 100);
