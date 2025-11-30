@@ -1,5 +1,2 @@
 export { ComputerDisplay } from './ComputerDisplay';
-export type {
-  ComputerDisplayProps,
-  ComputerDisplayRef,
-} from './types';
+export type { ComputerDisplayProps, ComputerDisplayHandle } from './types';
