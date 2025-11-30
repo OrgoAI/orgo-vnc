@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useImperativeHandle, forwardRef } from 'react';
+import { useMemo, useImperativeHandle, forwardRef, useState, useEffect } from 'react';
 import { useVNC } from './useVNC';
 import type { ComputerDisplayProps, ComputerDisplayRef } from './types';
 
@@ -22,7 +22,13 @@ export const ComputerDisplay = forwardRef<ComputerDisplayRef, ComputerDisplayPro
   onError,
   onClipboard,
 }, ref) => {
-  const url = useMemo(() => `wss://${instanceId}.orgo.dev/websockify`, [instanceId]);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const url = useMemo(() => mounted ? `wss://${instanceId}.orgo.dev/websockify` : '', [instanceId, mounted]);
 
   const credentials = useMemo(() => ({
     username: 'user',
@@ -61,6 +67,20 @@ export const ComputerDisplay = forwardRef<ComputerDisplayRef, ComputerDisplayPro
     pasteFromClipboard,
     isConnected,
   }), [reconnect, disconnect, sendClipboard, pasteFromClipboard, isConnected]);
+
+  if (!mounted) {
+    return (
+      <div
+        className={className}
+        style={{
+          width: '100%',
+          height: '100%',
+          background,
+          ...style,
+        }}
+      />
+    );
+  }
 
   return (
     <div
