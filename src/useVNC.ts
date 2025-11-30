@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import RFB from '@novnc/novnc/lib/rfb';
 import type { UseVNCConfig, UseVNCReturn } from './types';
-
-type RFBType = typeof import('@novnc/novnc/lib/rfb').default;
 
 interface ExtendedRFB {
   _eventListeners?: Record<string, EventListener[]>;
@@ -39,7 +38,6 @@ export function useVNC({
 }: UseVNCConfig): UseVNCReturn {
   const vncRef = useRef<HTMLDivElement>(null);
   const rfbRef = useRef<ExtendedRFB | null>(null);
-  const RFBRef = useRef<RFBType | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -48,14 +46,6 @@ export function useVNC({
   const retryTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const retryCount = useRef(0);
   const connecting = useRef(false);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined' && !RFBRef.current) {
-      import('@novnc/novnc/lib/rfb').then(mod => {
-        RFBRef.current = mod.default;
-      });
-    }
-  }, []);
 
   const disconnect = useCallback(() => {
     if (isDisconnecting.current) return;
@@ -96,18 +86,19 @@ export function useVNC({
   }, []);
 
   const connect = useCallback(() => {
-    if (!vncRef.current || !url || !isMounted.current || connecting.current || isDisconnecting.current || !RFBRef.current) return;
+    if (typeof window === 'undefined') return;
+    if (!vncRef.current || !url || !isMounted.current || connecting.current || isDisconnecting.current) return;
 
     connecting.current = true;
 
     setTimeout(() => {
-      if (!isMounted.current || !vncRef.current || !RFBRef.current) {
+      if (!isMounted.current || !vncRef.current) {
         connecting.current = false;
         return;
       }
 
       try {
-        const rfb = new RFBRef.current(vncRef.current, url, {
+        const rfb = new RFB(vncRef.current, url, {
           credentials: {
             username: credentials?.username || '',
             password: credentials?.password || '',
@@ -239,22 +230,15 @@ export function useVNC({
   }, [url, credentials, background, viewOnly, scaleViewport, clipViewport, resizeSession, showDotCursor, compressionLevel, qualityLevel, onConnect, onDisconnect, onError, onClipboard, disconnect]);
 
   useEffect(() => {
-    isMounted.current = true;
+    if (typeof window === 'undefined') return;
     
-    const initTimer = setTimeout(() => {
-      if (RFBRef.current && url && isMounted.current) {
-        connect();
-      } else if (!RFBRef.current && typeof window !== 'undefined') {
-        import('@novnc/novnc/lib/rfb').then(mod => {
-          RFBRef.current = mod.default;
-          if (url && isMounted.current) connect();
-        });
-      }
-    }, 100);
+    isMounted.current = true;
+    disconnect();
+    const timer = setTimeout(() => url && isMounted.current && connect(), 100);
 
     return () => {
       isMounted.current = false;
-      clearTimeout(initTimer);
+      clearTimeout(timer);
       if (retryTimer.current) clearTimeout(retryTimer.current);
       if (rfbRef.current) {
         try {
