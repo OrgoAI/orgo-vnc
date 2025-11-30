@@ -22,12 +22,11 @@ export const ComputerDisplay = forwardRef<ComputerDisplayRef, ComputerDisplayPro
   onClipboard,
 }, ref) => {
   const [Client, setClient] = useState<React.ComponentType<any> | null>(null);
+  const [clientRef, setClientRef] = useState<ComputerDisplayRef | null>(null);
 
   useEffect(() => {
-    import('./VNCClient').then(mod => setClient(() => mod.VNCClient));
+    import('./VNCClient.js').then(mod => setClient(() => mod.VNCClient));
   }, []);
-
-  const [clientRef, setClientRef] = useState<ComputerDisplayRef | null>(null);
 
   useImperativeHandle(ref, () => ({
     reconnect: () => clientRef?.reconnect(),
