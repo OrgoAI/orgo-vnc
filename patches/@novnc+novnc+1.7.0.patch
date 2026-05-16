@@ -1,0 +1,15 @@
+diff --git a/node_modules/@novnc/novnc/core/util/browser.js b/node_modules/@novnc/novnc/core/util/browser.js
+index 0000000..1111111 100644
+--- a/node_modules/@novnc/novnc/core/util/browser.js
++++ b/node_modules/@novnc/novnc/core/util/browser.js
+@@ -149,7 +149,9 @@
+
+     return true;
+ }
+-supportsWebCodecsH264Decode = await _checkWebCodecsH264DecodeSupport();
++_checkWebCodecsH264DecodeSupport().then(function (result) {
++  supportsWebCodecsH264Decode = result;
++});
+
+ /*
+  * The functions for detection of platforms and browsers below are exported

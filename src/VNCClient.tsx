@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef, useCallback } from 'react';
-import RFB from '@novnc/novnc/lib/rfb';
+import RFB from '@novnc/novnc';
 import type { ComputerDisplayProps } from './types';
 
 interface ExtendedRFB extends InstanceType<typeof RFB> {
@@ -39,7 +39,7 @@ export function VNCClient({
 
     let rfb: ExtendedRFB;
     try {
-      rfb = new RFB(container, `wss://${hostname}/websockify`, {
+      rfb = new RFB(container, `wss://${hostname}/websockify?token=${encodeURIComponent(password)}`, {
         credentials: { username: 'user', password, target: hostname },
         shared: true,
       }) as ExtendedRFB;
