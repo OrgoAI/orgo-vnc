@@ -23,6 +23,8 @@ declare module '@novnc/novnc/lib/rfb' {
     focusOnClick: boolean;
     disconnect(): void;
     clipboardPasteFrom(text: string): void;
+    /** Answer a `credentialsrequired` challenge. */
+    sendCredentials(credentials: RFBCredentials): void;
   }
 
   export default RFB;

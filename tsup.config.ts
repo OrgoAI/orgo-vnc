@@ -2,7 +2,7 @@ import { defineConfig } from 'tsup';
 
 export default defineConfig({
   entry: ['src/index.ts', 'src/VNCClient.tsx'],
-  format: ['esm'],
+  format: ['esm', 'cjs'],
   dts: true,
   splitting: true,
   sourcemap: true,
