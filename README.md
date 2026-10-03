@@ -3,7 +3,7 @@
 Embed an [Orgo](https://orgo.ai) cloud computer in your React app.
 
 ```bash
-npm install orgo-vnc @novnc/novnc
+npm install orgo-vnc
 ```
 
 ```tsx
@@ -125,7 +125,7 @@ The component is a convenience wrapper. Any websockify-compatible client works
 against the same URL:
 
 ```js
-import RFB from '@novnc/novnc/lib/rfb';
+import RFB from '@novnc/novnc'; // noVNC 1.7+
 
 const rfb = new RFB(
   container,

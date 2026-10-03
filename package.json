@@ -18,19 +18,16 @@
     }
   },
   "files": [
-    "dist",
-    "patches"
+    "dist"
   ],
   "scripts": {
-    "build": "tsup",
-    "dev": "tsup --watch",
-    "prepublishOnly": "npm run build",
-    "postinstall": "patch-package"
+    "build": "patch-package && tsup",
+    "dev": "patch-package && tsup --watch",
+    "prepublishOnly": "npm run build"
   },
   "peerDependencies": {
     "react": ">=18.0.0",
-    "react-dom": ">=18.0.0",
-    "@novnc/novnc": "^1.5.0"
+    "react-dom": ">=18.0.0"
   },
   "keywords": [
     "vnc",
@@ -48,13 +45,11 @@
   },
   "homepage": "https://orgo.ai",
   "type": "commonjs",
-  "dependencies": {
-    "@novnc/novnc": "1.6.0",
-    "patch-package": "^8.0.0"
-  },
   "devDependencies": {
+    "@novnc/novnc": "1.6.0",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
+    "patch-package": "^8.0.0",
     "tsup": "^8.5.1",
     "typescript": "^5.9.3"
   }
