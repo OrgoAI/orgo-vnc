@@ -49,7 +49,7 @@
   "homepage": "https://orgo.ai",
   "type": "commonjs",
   "dependencies": {
-    "@novnc/novnc": "^1.6.0",
+    "@novnc/novnc": "1.6.0",
     "patch-package": "^8.0.0"
   },
   "devDependencies": {
